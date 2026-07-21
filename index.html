@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Workspace Browser Dashboard</title>
+  <title>Workspace & Browser Dashboard</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Telegram Web App SDK -->
@@ -53,14 +53,12 @@
       transition: background-color 0.3s, color 0.3s;
     }
 
-    /* ফ্লোটিং বাটনগুলো যেন ব্রাউজার আইফ্রেমের উপরেও সব সময় ভেসে থাকে */
     .super-floating {
       position: fixed;
-      z-index: 100000 !important;
+      z-index: 9999 !important;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
     }
 
-    /* স্ক্রলবার হাইড করার নিয়ম */
     .scrollbar-none::-webkit-scrollbar {
       display: none;
     }
@@ -72,7 +70,7 @@
 </head>
 <body class="flex flex-col items-center justify-center p-4 md:p-6 overflow-x-hidden select-none">
 
-  <!-- থিম পরিবর্তন করার টপ হেডার বোতাম -->
+  <!-- থিম পরিবর্তন করার বোতাম -->
   <header class="absolute top-6 right-6 z-50">
     <button onclick="toggleTheme()" class="bg-slate-800 hover:bg-slate-700 text-slate-100 p-2.5 rounded-full border border-slate-700 transition" aria-label="Toggle Theme">
       <span id="themeBtnIcon" class="text-lg">🌙</span>
@@ -84,7 +82,7 @@
     
     <!-- সময় ও গ্রিটিংস সেকশন -->
     <section class="flex flex-col gap-2">
-      <h1 class="text-5xl font-bold tracking-tight text-white" id="clock">00:00 AM</h1>
+      <h1 class="text-5xl font-bold tracking-tight text-white animate-pulse" id="clock">00:00 AM</h1>
       <p class="text-lg text-slate-400 font-medium" id="greeting">Hello!</p>
     </section>
 
@@ -95,7 +93,7 @@
           <option value="google" class="bg-slate-900 text-white">Google</option>
           <option value="duckduckgo" class="bg-slate-900 text-white">DuckDuckGo</option>
         </select>
-        <input type="text" class="flex-1 bg-transparent border-none outline-none text-sm text-slate-100 placeholder-slate-500 py-1" id="searchInput" placeholder="Search the web or paste direct URL..." autocomplete="off">
+        <input type="text" class="flex-1 bg-transparent border-none outline-none text-sm text-slate-100 placeholder-slate-500 py-1" id="searchInput" placeholder="Search or type URL here..." autocomplete="off">
         <button class="text-teal-500 hover:text-teal-400 p-1" type="submit">
           <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
             <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
@@ -104,94 +102,136 @@
       </form>
     </section>
 
-    <!-- শর্টকাট গ্রিড (প্রথম ডিজাইনের স্টাইল অনুযায়ী) -->
+    <!-- শর্টকাট গ্রিড (অরিজিনাল ব্র্যান্ড লোগো সহ) -->
     <section class="grid grid-cols-3 sm:grid-cols-5 gap-4">
-      <!-- Facebook Mobile Basic (আইফ্রেম ব্লকিং এড়ানোর জন্য এটি সবচেয়ে কার্যকর) -->
-      <button onclick="openInternalBrowser('https://mbasic.facebook.com')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
-        <span class="text-2xl">📱</span>
-        <span class="text-xs font-semibold">Facebook</span>
+      
+      <!-- Facebook -->
+      <button onclick="openInternalBrowser('https://m.facebook.com')" class="flex flex-col items-center gap-3 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="#1877F2"/>
+        </svg>
+        <span class="text-[11px] font-semibold">Facebook</span>
       </button>
 
       <!-- Instagram -->
-      <button onclick="openInternalBrowser('https://www.instagram.com')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
-        <span class="text-2xl">📸</span>
-        <span class="text-xs font-semibold">Instagram</span>
+      <button onclick="openInternalBrowser('https://www.instagram.com')" class="flex flex-col items-center gap-3 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="ig-grad" x1="12" y1="0" x2="12" y2="24" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#f09433"/><stop offset="0.25" stop-color="#e6683c"/>
+              <stop offset="0.5" stop-color="#dc2743"/><stop offset="0.75" stop-color="#cc2366"/><stop offset="1" stop-color="#bc1888"/>
+            </linearGradient>
+          </defs>
+          <rect width="24" height="24" rx="5" fill="url(#ig-grad)"/>
+          <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8.2c-1.76 0-3.2-1.44-3.2-3.2s1.44-3.2 3.2-3.2 3.2 1.44 3.2 3.2-1.44 3.2-3.2 3.2zm5.3-8.83c-.41 0-.74.33-.74.74s.33.74.74.74.74-.33.74-.74-.33-.74-.74-.74z" fill="white"/>
+        </svg>
+        <span class="text-[11px] font-semibold">Instagram</span>
       </button>
 
-      <!-- WhatsApp Web -->
-      <button onclick="openInternalBrowser('https://web.whatsapp.com')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
-        <span class="text-2xl">💬</span>
-        <span class="text-xs font-semibold">WhatsApp</span>
+      <!-- WhatsApp -->
+      <button onclick="openInternalBrowser('https://web.whatsapp.com')" class="flex flex-col items-center gap-3 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12.012 0C5.398 0 .024 5.374.024 11.99c0 2.112.55 4.17 1.594 5.978L.002 24l6.196-1.625c1.744.95 3.71 1.45 5.81 1.45 6.614 0 11.988-5.374 11.988-11.99C24 5.374 18.626 0 12.012 0zm6.91 16.99c-.284.8-1.42 1.464-1.956 1.562-.493.1-1.134.177-3.23-.694-2.684-1.11-4.416-3.842-4.55-4.02-.133-.178-1.085-1.442-1.085-2.75 0-1.308.683-1.95.927-2.217.244-.267.534-.334.712-.334.178 0 .356.002.51.01.164.007.387-.06.604.464.223.535.76 1.854.827 1.987.067.133.111.29.022.467-.09.178-.133.29-.267.445-.133.155-.28.346-.4.49-.133.156-.273.324-.117.59.155.266.69 1.133 1.478 1.834.156.14.305.283.473.388.164.103.327.17.493.067s.712-.824.9-.1.356-.16.59-.06c.234.1.1.41.13.56.03.15.03.27.03.39c-.04.4-.33 1.25-.49 1.49z" fill="#25D366"/>
+        </svg>
+        <span class="text-[11px] font-semibold">WhatsApp</span>
       </button>
 
-      <!-- Telegram Web -->
-      <button onclick="openInternalBrowser('https://web.telegram.org')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
-        <span class="text-2xl">✈️</span>
-        <span class="text-xs font-semibold">Telegram</span>
+      <!-- Telegram -->
+      <button onclick="openInternalBrowser('https://web.telegram.org')" class="flex flex-col items-center gap-3 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 24c6.627 0 12-5.373 12-12S18.627 0 12 0 0 5.373 0 12s5.373 12 12 12z" fill="#0088cc"/>
+          <path d="M18.35 6.65a.512.512 0 0 0-.52-.08l-12.5 4.81c-.42.16-.41.52-.09.64l3.21 1 7.46-4.7c.35-.22.67-.1.4.15l-6.04 5.45-.24 3.4c.34 0 .49-.15.68-.33l1.63-1.58 3.39 2.5a.514.514 0 0 0 .84-.33l2.22-10.45a.512.512 0 0 0-.44-.48z" fill="#ffffff"/>
+        </svg>
+        <span class="text-[11px] font-semibold">Telegram</span>
       </button>
 
       <!-- Messenger -->
-      <button onclick="openInternalBrowser('https://www.messenger.com')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
-        <span class="text-2xl">⚡</span>
-        <span class="text-xs font-semibold">Messenger</span>
+      <button onclick="openInternalBrowser('https://www.messenger.com')" class="flex flex-col items-center gap-3 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="messenger-grad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#09F"/><stop offset="0.5" stop-color="#A0F"/><stop offset="1" stop-color="#F39"/>
+            </linearGradient>
+          </defs>
+          <path d="M12 0C5.17 0 0 4.88 0 11.45c0 3.4 1.4 6.4 3.75 8.44V24l3.96-2.18c1.33.37 2.76.57 4.29.57 6.83 0 12-4.88 12-11.45C24 4.88 18.83 0 12 0zm1.28 14.86l-2.88-3.08-5.63 3.1 6.2-6.58 2.92 3.08 5.58-3.1-6.19 6.58z" fill="url(#messenger-grad)"/>
+        </svg>
+        <span class="text-[11px] font-semibold">Messenger</span>
       </button>
 
       <!-- TikTok -->
-      <button onclick="openInternalBrowser('https://www.tiktok.com')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
-        <span class="text-2xl">🎵</span>
-        <span class="text-xs font-semibold">TikTok</span>
+      <button onclick="openInternalBrowser('https://www.tiktok.com')" class="flex flex-col items-center gap-3 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12z" fill="#010101"/>
+          <path d="M16.8 6.9c-1 .07-1.87-.33-2.45-1.02V13c0 2.2-1.8 4-4 4s-4-1.8-4-4 1.8-4 4-4c.37 0 .72.06 1.05.16v2.1c-.32-.16-.67-.26-1.05-.26-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2V4h2.2c0 1.25.8 2.3 1.95 2.75-.12.05-.25.11-.35.15z" fill="#fff"/>
+        </svg>
+        <span class="text-[11px] font-semibold">TikTok</span>
       </button>
 
-      <!-- X (Twitter) -->
-      <button onclick="openInternalBrowser('https://www.x.com')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
-        <span class="text-2xl">🐦</span>
-        <span class="text-xs font-semibold">Twitter (X)</span>
+      <!-- Twitter (X) -->
+      <button onclick="openInternalBrowser('https://x.com')" class="flex flex-col items-center gap-3 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="24" height="24" rx="5" fill="#000000"/>
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="#ffffff"/>
+        </svg>
+        <span class="text-[11px] font-semibold">Twitter (X)</span>
       </button>
 
       <!-- LinkedIn -->
-      <button onclick="openInternalBrowser('https://www.linkedin.com')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
-        <span class="text-2xl">💼</span>
-        <span class="text-xs font-semibold">LinkedIn</span>
+      <button onclick="openInternalBrowser('https://www.linkedin.com')" class="flex flex-col items-center gap-3 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.23 0H1.77C.8 0 0 .77 0 1.72v20.56C0 23.23.8 24 1.77 24h20.46c.98 0 1.77-.77 1.77-1.72V1.72C24 .77 23.2 0 22.23 0zM7.12 20.45H3.56V9h3.56v11.45zM5.34 7.43c-1.14 0-2.06-.92-2.06-2.06 0-1.14.92-2.06 2.06-2.06 1.14 0 2.06.92 2.06 2.06 0 1.14-.92 2.06-2.06 2.06zm15.11 13.02h-3.56v-5.6c0-1.34-.03-3.05-1.86-3.05-1.86 0-2.14 1.45-2.14 2.95v5.7h-3.56V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29z" fill="#0A66C2"/>
+        </svg>
+        <span class="text-[11px] font-semibold">LinkedIn</span>
       </button>
 
       <!-- YouTube -->
-      <button onclick="openInternalBrowser('https://www.youtube.com')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
-        <span class="text-2xl">🔴</span>
-        <span class="text-xs font-semibold">YouTube</span>
+      <button onclick="openInternalBrowser('https://www.youtube.com')" class="flex flex-col items-center gap-3 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.516 0-9.387.507a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.507 9.387.507 9.387.507s7.517 0 9.387-.507a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="#FF0000"/>
+        </svg>
+        <span class="text-[11px] font-semibold">YouTube</span>
       </button>
 
-      <!-- Google Search Homepage Shortcut -->
-      <button onclick="openInternalBrowser('https://www.google.com')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
-        <span class="text-2xl">🌐</span>
-        <span class="text-xs font-semibold">Google</span>
+      <!-- Google -->
+      <button onclick="openInternalBrowser('https://www.google.com')" class="flex flex-col items-center gap-3 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+        </svg>
+        <span class="text-[11px] font-semibold">Google</span>
       </button>
+
     </section>
-
   </div>
 
-  <!-- ইন-অ্যাপ ব্রাউজার ওভারলে (অ্যাপের বাইরে কোনো রিডাইরেক্ট হবে না) -->
-  <div id="browserOverlay" class="fixed inset-0 bg-slate-950 flex flex-col z-[90000] transition-all transform translate-y-full duration-300 hidden">
+  <!-- ব্রাউজার ওভারলে (নন-টেলিগ্রাম বা পিসি ব্রাউজিংয়ের জন্য ব্যাকআপ) -->
+  <div id="browserOverlay" class="fixed inset-0 bg-slate-950 flex flex-col z-[9000] transition-all transform translate-y-full duration-300 hidden">
     <!-- ব্রাউজার কন্ট্রোল বার -->
     <div class="bg-slate-900 border-b border-slate-800 p-3 flex flex-wrap items-center justify-between gap-2">
       <div class="flex items-center gap-2">
         <button onclick="closeInternalBrowser()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-2 rounded-lg font-bold">✕ Close</button>
         <button onclick="reloadInternalBrowser()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-2 rounded-lg font-bold">🔄 Reload</button>
-        <!-- আইফ্রেম ব্লকিং এড়ানোর জন্য অল্টারনেটিভ ভিউ বাটন -->
-        <button onclick="openViaAltMethod()" class="bg-teal-700 hover:bg-teal-600 text-white text-[11px] px-3 py-2 rounded-lg font-bold">Alt View 🌐</button>
+        <button onclick="openViaAltMethod()" class="bg-teal-700 hover:bg-teal-600 text-white text-[11px] px-3 py-2 rounded-lg font-bold">Launch Website 🌐</button>
       </div>
       <div class="flex-1 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 text-[11px] text-slate-400 text-center font-mono truncate max-w-xs" id="browserUrlDisplay">
         about:blank
       </div>
       <div class="text-xs text-slate-500" id="browserLoadingState">Active</div>
     </div>
-    <!-- ব্রাউজার কন্টেন্ট ফ্রেম -->
+    
+    <!-- ফ্রেম এরিয়া এবং ইনফো ব্যানার -->
+    <div class="bg-slate-900 px-4 py-2 text-center text-xs text-slate-400 border-b border-slate-800">
+      ⚠️ সিকিউরিটির জন্য অনেক বড় ওয়েবসাইট iframe-এ ব্লক হতে পারে। সেরকম হলে সরাসরি উপরের <strong class="text-teal-400">"Launch Website 🌐"</strong> বাটনে ক্লিক করে ফুল স্ক্রিনে ওপেন করুন।
+    </div>
     <div class="flex-1 bg-white relative">
       <iframe id="browserIframe" class="w-full h-full border-none" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"></iframe>
     </div>
   </div>
 
   <!-- সর্বদাই দৃশ্যমান বাটন ১: NUMBER BOT (টেলিগ্রাম বট ওপেন করার জন্য) -->
-  <button onclick="openNumberBot()" class="super-floating bottom-5 right-5 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white font-bold px-6 py-4 rounded-full flex items-center gap-2 transition-all transform hover:scale-105 active:scale-95 animate-pulse">
+  <button onclick="openNumberBot()" class="super-floating bottom-5 right-5 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white font-bold px-6 py-4 rounded-full flex items-center gap-2 transition-all transform hover:scale-105 active:scale-95 animate-bounce">
     <span>🤖</span>
     <span class="text-sm">Number Bot</span>
   </button>
@@ -201,8 +241,8 @@
     <span>🍪</span>
   </button>
 
-  <!-- নোটিশ ও সাপোর্ট জয়েনিং মডাল (নোটিশ সিস্টেম মেসেজ আকারে স্ক্রিনে পপআপ হবে) -->
-  <div id="noticeModal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-[999999] hidden">
+  <!-- নোটিশ ও সাপোর্ট জয়েনিং মডাল -->
+  <div id="noticeModal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-[99999] hidden">
     <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
       <div class="text-4xl mb-3">📢</div>
       <h3 class="text-lg font-bold text-teal-400 mb-2">জরুরী ঘোষণা!</h3>
@@ -215,7 +255,7 @@
   </div>
 
   <!-- কুকি দেখার ও কপি করার উইন্ডো প্যানেল -->
-  <div id="cookieModal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-[999999] hidden">
+  <div id="cookieModal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-[99999] hidden">
     <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-sm font-bold text-teal-400">🍪 Cookie Helper</h3>
@@ -224,7 +264,7 @@
       <p class="text-[11px] text-slate-400 mb-3 leading-relaxed">
         নিরাপত্তাজনিত কারণে ব্রাউজার ওভারলের কুকি সরাসরি জাভাস্ক্রিপ্ট পড়তে পারে না। তবে এই ডোমেইনের কুকি অথবা নিচের টেক্সট বক্সে পেস্ট করে যেকোনো ডাটা ক্লিপবোর্ডে কপি করতে পারেন।
       </p>
-      <textarea id="cookieBox" class="w-full h-24 bg-slate-950 text-slate-300 font-mono text-[10px] p-2.5 rounded-lg border border-slate-700 outline-none resize-none mb-3" placeholder="Cookies/Session state will appear here..."></textarea>
+      <textarea id="cookieBox" class="w-full h-24 bg-slate-950 text-slate-300 font-mono text-[10px] p-2.5 rounded-lg border border-slate-700 outline-none resize-none mb-3" placeholder="Cookies/Session state..."></textarea>
       <div class="flex gap-2">
         <button onclick="copyCookiesToClipboard()" class="flex-1 bg-teal-600 hover:bg-teal-500 py-2.5 rounded-lg text-xs font-bold transition shadow">Copy to Clipboard</button>
         <button onclick="readLocalCookies()" class="bg-slate-700 hover:bg-slate-600 px-3 rounded-lg text-xs transition">Read Current</button>
@@ -232,19 +272,18 @@
     </div>
   </div>
 
-  <!-- ব্যান স্ক্রিন (ব্যানড ইউজারদের জন্য পুরো অ্যাপ লক করা হবে) -->
-  <div id="banScreen" class="fixed inset-0 bg-slate-950 flex flex-col items-center justify-center p-6 text-center z-[9999999] hidden">
+  <!-- ব্যান স্ক্রিন -->
+  <div id="banScreen" class="fixed inset-0 bg-slate-950 flex flex-col items-center justify-center p-6 text-center z-[999999] hidden">
     <div class="text-6xl mb-4">🚫</div>
     <h1 class="text-2xl font-bold text-red-500 mb-2">আপনার অ্যাকাউন্টটি স্থগিত করা হয়েছে</h1>
     <p class="text-sm text-slate-400 max-w-md">অ্যাডমিন কর্তৃক আপনার টেলিগ্রাম অ্যাকাউন্টটি ব্লক করা হয়েছে। বিস্তারিত জানতে সাপোর্টে যোগাযোগ করুন।</p>
   </div>
 
   <script>
-    // --- SUPABASE CONFIGURATION (Renamed to prevent shadowing/redeclaration bugs) ---
+    // --- SUPABASE CONFIGURATION ---
     const SUPABASE_URL = "https://xodqwxxeeeyoayfdtlno.supabase.co"; 
     const SUPABASE_ANON_KEY = "sb_publishable_jj7OSFz9Ze8MLuIvOmLdJA_0j_RFppz"; 
     
-    // global 'supabase' variable from script tag is used here
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // --- TELEGRAM WEB APP SDK ---
@@ -254,14 +293,12 @@
       tg.ready();
     }
 
-    // ডিফল্ট ডামি ইউজার (টেলিগ্রামের বাইরে সাধারণ ব্রাউজারে টেস্ট করার জন্য)
     let userProfile = {
       id: "WebUser_Testing_12345",
       username: "Web_Tester",
       first_name: "Web Browser Guest"
     };
 
-    // টেলিগ্রাম থেকে ইউজার ডাটা রিসিভ করা
     if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
       const tgUser = tg.initDataUnsafe.user;
       userProfile = {
@@ -271,11 +308,10 @@
       };
     }
 
-    let botLink = "https://t.me/shs_method_bot"; // আপনার দেওয়া মিনি অ্যাপের প্রধান বটের লিংক
+    let botLink = "https://t.me/shs_method_bot"; 
     let supportLink = "https://t.me/shs_method_bot";
     let currentBrowserUrl = "about:blank";
 
-    // --- APP START UP ---
     window.addEventListener('DOMContentLoaded', async () => {
       updateClock();
       setInterval(updateClock, 1000);
@@ -283,7 +319,6 @@
       await fetchAppSettings();
     });
 
-    // ১. ইউজার রেজিস্টার এবং ব্যান পরীক্ষা করা
     async function registerAndCheckUser() {
       try {
         const { data: user, error } = await supabaseClient
@@ -320,7 +355,6 @@
       }
     }
 
-    // ২. রিমোট সেটিংস, নোটিশ, সাপোর্ট লিংক এবং বট লিংক লোড করা
     async function fetchAppSettings() {
       try {
         const { data, error } = await supabaseClient.from('app_settings').select('*');
@@ -341,7 +375,6 @@
           }
         });
 
-        // নোটিশ মেসেজ আকারে সামনে পপআপ করার জন্য
         if (noticeMessage) {
           document.getElementById('noticeModalText').textContent = noticeMessage;
           const hasSeenNotice = localStorage.getItem('seen_notice_' + btoa(noticeMessage));
@@ -354,7 +387,6 @@
       }
     }
 
-    // ৩. রিয়েল-টাইম ঘড়ি এবং গ্রিটিংস
     function updateClock() {
       const clockElement = document.getElementById('clock');
       const greetingElement = document.getElementById('greeting');
@@ -382,7 +414,6 @@
       }
     }
 
-    // ৪. থিম পরিবর্তন লজিক
     function applyTheme(theme) {
       document.documentElement.setAttribute('data-theme', theme);
       localStorage.setItem('theme', theme);
@@ -391,7 +422,6 @@
       if (themeIconEl) themeIconEl.textContent = icon;
     }
 
-    // Attach function to window to prevent "not defined" errors in HTML attributes
     window.toggleTheme = function() {
       const currentTheme = document.documentElement.getAttribute('data-theme');
       const targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -401,7 +431,6 @@
     const savedTheme = localStorage.getItem('theme') || 'dark';
     applyTheme(savedTheme);
 
-    // ৫. সার্চ এবং ইনপুট ইউআরএল হ্যান্ডলিং
     window.handleSearchSubmit = function(event) {
       event.preventDefault();
       const query = document.getElementById('searchInput').value.trim();
@@ -425,13 +454,20 @@
       openInternalBrowser(destinationUrl);
     }
 
-    // ৬. ইন-অ্যাপ ব্রাউজার ওভারলে কন্ট্রোল
     window.openInternalBrowser = function(url) {
+      currentBrowserUrl = url;
+
+      // ১. যদি অ্যাপটি টেলিগ্রাম মিনি অ্যাপের মধ্যে চলে (মোবাইল অ্যাপ)
+      if (tg && typeof tg.openLink === 'function') {
+        tg.openLink(url);
+        return;
+      }
+
+      // ২. পিসি ব্রাউজার বা সাধারণ ব্রাউজার টেস্টিং ব্যাকআপের জন্য
       const overlay = document.getElementById('browserOverlay');
       const iframe = document.getElementById('browserIframe');
       const displayUrl = document.getElementById('browserUrlDisplay');
       
-      currentBrowserUrl = url;
       if (displayUrl) displayUrl.textContent = url;
       document.getElementById('browserLoadingState').textContent = "Loading...";
       
@@ -467,10 +503,8 @@
       }
     }
 
-    // আইফ্রেম সিকিউরিটি পলিসি বাইপাস করার জন্য অল্টারনেটিভ ভিউ মেথড
     window.openViaAltMethod = function() {
       if (currentBrowserUrl && currentBrowserUrl !== "about:blank") {
-        // টেলিগ্রামের স্ট্যান্ডার্ড ইন-অ্যাপ ব্রাউজার ব্যবহার করা (এটি ফেসবুকের আইফ্রেম ব্লকিং এড়িয়ে চলবে)
         if (tg) {
           tg.openLink(currentBrowserUrl);
         } else {
@@ -485,7 +519,6 @@
       document.getElementById('noticeModal').classList.add('hidden');
     }
 
-    // ৭. Number Bot অ্যাকশন
     window.openNumberBot = function() {
       if (tg) {
         tg.openTelegramLink(botLink);
@@ -494,7 +527,6 @@
       }
     }
 
-    // ৮. কুকি ম্যানেজার অ্যাকশন
     window.openCookieManager = function() {
       document.getElementById('cookieModal').classList.remove('hidden');
       readLocalCookies();
