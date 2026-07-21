@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workspace & Browser</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Telegram Web App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Supabase JS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* আইফ্রেম বা অন্য কন্টেন্টের উপরে বাটন ফিক্সড রাখার জন্য স্টাইল */
+    .floating-btn {
+      position: fixed;
+      z-index: 99999;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col overflow-hidden select-none">
+
+  <!-- টপ নোটিশ বার (এডমিন দ্বারা নিয়ন্ত্রিত) -->
+  <div class="bg-teal-700 text-white text-xs py-1.5 px-4 overflow-hidden relative flex items-center z-50">
+    <span class="font-bold mr-2 shrink-0">NOTICE:</span>
+    <marquee id="marqueeNotice" scrollamount="4" class="w-full">লোড হচ্ছে...</marquee>
+  </div>
+
+  <!-- ইন-অ্যাপ ব্রাউজার হেডার ও অ্যাড্রেস বার -->
+  <header class="bg-slate-800 border-b border-slate-700 p-2 flex flex-col gap-2 z-40 shadow-md">
+    <div class="flex items-center gap-2">
+      <button onclick="goHome()" class="bg-slate-700 hover:bg-slate-600 p-2 rounded-lg text-sm font-semibold">🏠 Home</button>
+      <div class="flex-1 flex bg-slate-950 rounded-lg overflow-hidden border border-slate-700">
+        <input type="text" id="urlInput" placeholder="Enter URL to browse (e.g. facebook.com)" class="bg-transparent text-xs text-slate-200 px-3 py-2 w-full outline-none">
+        <button onclick="navigateBrowser()" class="bg-teal-600 hover:bg-teal-500 px-4 text-xs font-bold">Go</button>
+      </div>
+    </div>
+    <!-- কুইক শর্টকাট পোর্টাল সমূহ -->
+    <div class="flex gap-2 overflow-x-auto pb-1 text-xs scrollbar-none">
+      <button onclick="loadSite('https://www.facebook.com')" class="bg-blue-600 px-3 py-1 rounded-full shrink-0">Facebook</button>
+      <button onclick="loadSite('https://www.instagram.com')" class="bg-pink-600 px-3 py-1 rounded-full shrink-0">Instagram</button>
+      <button onclick="loadSite('https://www.youtube.com')" class="bg-red-600 px-3 py-1 rounded-full shrink-0">YouTube</button>
+      <button onclick="loadSite('https://web.whatsapp.com')" class="bg-green-600 px-3 py-1 rounded-full shrink-0">WhatsApp</button>
+      <button onclick="loadSite('https://google.com')" class="bg-slate-600 px-3 py-1 rounded-full shrink-0">Google</button>
+    </div>
+  </header>
+
+  <!-- ব্রাউজার ওয়ার্কস্পেস (আইফ্রেম) -->
+  <main class="flex-1 relative bg-slate-950">
+    <!-- হোম স্ক্রিন কন্টেন্ট (শুরুতে আইফ্রেম খালি থাকলে দেখাবে) -->
+    <div id="homePlaceholder" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10 bg-slate-900">
+      <div class="max-w-md">
+        <h2 class="text-2xl font-bold text-teal-400 mb-2">My Safe Browser</h2>
+        <p class="text-sm text-slate-400 mb-6">অ্যাপের ভেতরে থেকেই যেকোনো ওয়েবসাইট ভিজিট করুন নিরাপদ ও নির্বিঘ্নে।</p>
+        <div class="grid grid-cols-2 gap-4">
+          <button onclick="loadSite('https://mbasic.facebook.com')" class="bg-slate-800 hover:bg-slate-700 p-4 rounded-xl border border-slate-700">
+            <span class="block text-lg">📱</span>
+            <span class="text-xs font-semibold">Facebook Mobile</span>
+          </button>
+          <button onclick="loadSite('https://google.com')" class="bg-slate-800 hover:bg-slate-700 p-4 rounded-xl border border-slate-700">
+            <span class="block text-lg">🔍</span>
+            <span class="text-xs font-semibold">Google Search</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- মূল ব্রাউজার আইফ্রেম -->
+    <iframe id="browserFrame" class="w-full h-full border-none hidden" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+  </main>
+
+  <!-- সর্বদাই দৃশ্যমান বাটন ১: NUMBER BOT (টেলিগ্রাম বট ওপেন করার জন্য) -->
+  <button onclick="openNumberBot()" class="floating-btn bottom-5 right-5 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white font-bold px-5 py-3.5 rounded-full flex items-center gap-2 transition-all transform hover:scale-105 active:scale-95 animate-pulse">
+    <span>🤖</span>
+    <span class="text-sm">Number Bot</span>
+  </button>
+
+  <!-- সর্বদাই দৃশ্যমান বাটন ২: COOKIE COPIER (কুকি কপি করার প্যানেল) -->
+  <button onclick="openCookieManager()" class="floating-btn bottom-24 right-5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 font-semibold p-3.5 rounded-full flex items-center justify-center transition-all">
+    <span>🍪</span>
+  </button>
+
+  <!-- সাপোর্ট চ্যানেলে জয়েন করার নোটিফিকেশন মডাল (প্রথমবার ওপেন করলে আসবে) -->
+  <div id="supportModal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-[999999] hidden">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
+      <div class="text-4xl mb-3">📢</div>
+      <h3 class="text-lg font-bold text-teal-400 mb-2">সাপোর্ট চ্যানেলে জয়েন করুন!</h3>
+      <p id="supportNoticeText" class="text-xs text-slate-300 mb-6">আমাদের সাপোর্ট চ্যানেলে জয়েন করে নতুন সব আপডেট ও সাহায্য সরাসরি গ্রহণ করুন।</p>
+      <div class="flex flex-col gap-2">
+        <a id="btnSupportJoin" href="#" target="_blank" onclick="closeSupportModal()" class="bg-teal-600 hover:bg-teal-500 py-2.5 rounded-lg text-sm font-bold block text-white">Join Channel</a>
+        <button onclick="closeSupportModal()" class="text-slate-400 hover:text-slate-300 text-xs py-1">পরে করবো</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- কুকি দেখার ও কপি করার মডাল উইন্ডো -->
+  <div id="cookieModal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-[999999] hidden">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-sm font-bold text-teal-400">🍪 Cookie & Storage Helper</h3>
+        <button onclick="closeCookieModal()" class="text-slate-400 text-sm">✕</button>
+      </div>
+      <p class="text-[11px] text-slate-400 mb-3 leading-relaxed">
+        নিরাপত্তাজনিত কারণে ব্রাউজার আইফ্রেমের ভেতরের থার্ড-পার্টি কুকি সরাসরি স্ক্রিপ্ট দিয়ে কপি করা সম্ভব নয়। তবে নিচের বাটনটি দিয়ে এই ডোমেইনের কুকি অথবা ম্যানুয়ালি ইনপুট দিয়ে কপি করতে পারেন।
+      </p>
+      <textarea id="cookieBox" class="w-full h-24 bg-slate-950 text-slate-300 font-mono text-[10px] p-2 rounded-lg border border-slate-700 outline-none resize-none mb-3" placeholder="Cookies will appear here or paste raw string..."></textarea>
+      <div class="flex gap-2">
+        <button onclick="copyCookiesToClipboard()" class="flex-1 bg-teal-600 hover:bg-teal-500 py-2 rounded-lg text-xs font-bold">Copy to Clipboard</button>
+        <button onclick="readLocalCookies()" class="bg-slate-700 hover:bg-slate-600 px-3 rounded-lg text-xs">Read</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ব্যান স্ক্রিন (ব্যানড ইউজারদের জন্য পুরো অ্যাপ ব্লক করা হবে) -->
+  <div id="banScreen" class="fixed inset-0 bg-slate-950 flex flex-col items-center justify-center p-6 text-center z-[9999999] hidden">
+    <div class="text-6xl mb-4">🚫</div>
+    <h1 class="text-2xl font-bold text-red-500 mb-2">আপনার অ্যাকাউন্টটি সাময়িকভাবে স্থগিত করা হয়েছে</h1>
+    <p class="text-sm text-slate-400 max-w-md">অ্যাডমিন কর্তৃক আপনার ইউজার আইডিটি ব্লক করা হয়েছে। বিস্তারিত জানতে সাপোর্টে যোগাযোগ করুন।</p>
+  </div>
+
+  <script>
+    // --- SUPABASE CONFIGURATION ---
+    const SUPABASE_URL = "https://xodqwxxeeeyoayfdtlno.supabase.co"; // আপনার Supabase URL বসান
+    const SUPABASE_ANON_KEY = "sb_publishable_jj7OSFz9Ze8MLuIvOmLdJA_0j_RFppz"; // আপনার Supabase Anon Key বসান
+    
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // --- TELEGRAM APP INITIALIZATION ---
+    let tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.expand(); // টেলিগ্রাম স্ক্রিন বড় করা
+      tg.ready();
+    }
+
+    // ডিফল্ট ডামি ইউজার (টেলিগ্রামের বাইরে টেস্ট করার জন্য)
+    let userProfile = {
+      id: "WebUser_12345",
+      username: "Guest_User",
+      first_name: "Web Guest"
+    };
+
+    // টেলিগ্রাম থেকে ইউজার ডাটা রিসিভ করা
+    if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+      const tgUser = tg.initDataUnsafe.user;
+      userProfile = {
+        id: String(tgUser.id),
+        username: tgUser.username || "No_Username",
+        first_name: tgUser.first_name || "TG_User"
+      };
+    }
+
+    let botLink = "https://t.me/your_number_bot"; // ডামি বট লিংক
+    let supportLink = "https://t.me/your_support_channel";
+
+    // --- APP START UP ---
+    window.addEventListener('DOMContentLoaded', async () => {
+      await registerAndCheckUser();
+      await fetchAppSettings();
+      showAnnouncementNotification();
+    });
+
+    // ১. ইউজার রেজিস্টার এবং ব্যান স্ট্যাটাস চেক করা
+    async function registerAndCheckUser() {
+      try {
+        // প্রথমে ডাটাবেজে ইউজার চেক করা
+        const { data: user, error } = await supabase
+          .from('telegram_users')
+          .select('*')
+          .eq('id', userProfile.id)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (user) {
+          // ইউজার ব্যান আছে কিনা পরীক্ষা
+          if (user.is_banned) {
+            document.getElementById('banScreen').classList.remove('hidden');
+            return;
+          }
+          // শেষ অ্যাক্টিভিটি টাইম আপডেট
+          await supabase
+            .from('telegram_users')
+            .update({ last_active: new Date().toISOString() })
+            .eq('id', userProfile.id);
+        } else {
+          // নতুন ইউজার ডাটাবেজে সেভ করা
+          await supabase
+            .from('telegram_users')
+            .insert([{
+              id: userProfile.id,
+              username: userProfile.username,
+              first_name: userProfile.first_name,
+              join_date: new Date().toISOString(),
+              last_active: new Date().toISOString(),
+              is_banned: false
+            }]);
+        }
+      } catch (e) {
+        console.error("User registration failed: ", e);
+      }
+    }
+
+    // ২. এডমিন প্যানেলের নোটিশ, বটের লিংক এবং সাপোর্ট লিংক রিমোটলি লোড করা
+    async function fetchAppSettings() {
+      try {
+        const { data, error } = await supabase.from('app_settings').select('*');
+        if (error) throw error;
+
+        data.forEach(item => {
+          if (item.key === 'global_notice') {
+            document.getElementById('marqueeNotice').textContent = item.value;
+            document.getElementById('supportNoticeText').textContent = item.value;
+          }
+          if (item.key === 'support_link') {
+            supportLink = item.value;
+            document.getElementById('btnSupportJoin').href = item.value;
+          }
+          if (item.key === 'bot_link') {
+            botLink = item.value;
+          }
+        });
+      } catch (e) {
+        console.error("Failed to load settings: ", e);
+      }
+    }
+
+    // ৩. প্রথমবার জয়েন করার প্রম্পট নোটিফিকেশন দেখানো
+    function showAnnouncementNotification() {
+      const hasJoined = localStorage.getItem('has_seen_join_modal');
+      if (!hasJoined) {
+        document.getElementById('supportModal').classList.remove('hidden');
+      }
+    }
+
+    function closeSupportModal() {
+      localStorage.setItem('has_seen_join_modal', 'true');
+      document.getElementById('supportModal').classList.add('hidden');
+    }
+
+    // ৪. ইন-অ্যাপ ব্রাউজার ন্যাভিগেশন ও আইফ্রেম সেটআপ
+    function loadSite(url) {
+      document.getElementById('homePlaceholder').classList.add('hidden');
+      const iframe = document.getElementById('browserFrame');
+      iframe.classList.remove('hidden');
+      iframe.src = url;
+      document.getElementById('urlInput').value = url;
+    }
+
+    function navigateBrowser() {
+      let url = document.getElementById('urlInput').value.trim();
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
+      }
+      loadSite(url);
+    }
+
+    function goHome() {
+      document.getElementById('browserFrame').classList.add('hidden');
+      document.getElementById('homePlaceholder').classList.remove('hidden');
+      document.getElementById('urlInput').value = "";
+    }
+
+    // ৫. NUMBER BOT ওপেন করার অ্যাকশন
+    function openNumberBot() {
+      if (tg) {
+        tg.openTelegramLink(botLink);
+      } else {
+        window.open(botLink, '_blank');
+      }
+    }
+
+    // ৬. কুকি ম্যানেজার অ্যাকশন
+    function openCookieManager() {
+      document.getElementById('cookieModal').classList.remove('hidden');
+      readLocalCookies();
+    }
+
+    function closeCookieModal() {
+      document.getElementById('cookieModal').classList.add('hidden');
+    }
+
+    function readLocalCookies() {
+      // লোকাল কুকি রিড করার চেষ্টা করা
+      try {
+        const cookies = document.cookie || "No local cookies accessible on this site. You can paste custom raw headers or cookies here to keep them in clipboard.";
+        document.getElementById('cookieBox').value = cookies;
+      } catch (e) {
+        document.getElementById('cookieBox').value = "Error reading cookies.";
+      }
+    }
+
+    function copyCookiesToClipboard() {
+      const box = document.getElementById('cookieBox');
+      box.select();
+      box.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(box.value);
+      alert("Cookies copied to clipboard!");
+    }
+  </script>
+</body>
+  </html>
