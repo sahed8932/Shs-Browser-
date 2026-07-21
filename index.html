@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Workspace & Browser</title>
+  <title>Workspace & Browser Dashboard</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Telegram Web App SDK -->
@@ -11,133 +11,254 @@
   <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    /* আইফ্রেম বা অন্য কন্টেন্টের উপরে বাটন ফিক্সড রাখার জন্য স্টাইল */
-    .floating-btn {
+    :root {
+      --bg-color: #0b0f19;
+      --text-color: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent-color: #0d9488;
+      --accent-hover: #0f766e;
+      --card-bg: rgba(30, 41, 59, 0.4);
+      --card-hover: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --search-bg: rgba(30, 41, 59, 0.6);
+      --search-border: rgba(255, 255, 255, 0.1);
+      --shadow-color: rgba(0, 0, 0, 0.3);
+    }
+
+    [data-theme="light"] {
+      --bg-color: #f8fafc;
+      --text-color: #0f172a;
+      --text-muted: #64748b;
+      --accent-color: #0d9488;
+      --accent-hover: #0f766e;
+      --card-bg: rgba(255, 255, 255, 0.7);
+      --card-hover: rgba(255, 255, 255, 0.9);
+      --card-border: rgba(0, 0, 0, 0.08);
+      --search-bg: #ffffff;
+      --search-border: rgba(0, 0, 0, 0.1);
+      --shadow-color: rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* ফ্লোটিং বাটনগুলো যেন ব্রাউজার আইফ্রেমের উপরেও সব সময় ভেসে থাকে */
+    .super-floating {
       position: fixed;
-      z-index: 99999;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      z-index: 100000 !important;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+    }
+
+    /* স্ক্রলবার হাইড করার নিয়ম */
+    .scrollbar-none::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-none {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col overflow-hidden select-none">
+<body class="flex flex-col items-center justify-center p-4 md:p-6 overflow-x-hidden select-none">
 
-  <!-- টপ নোটিশ বার (এডমিন দ্বারা নিয়ন্ত্রিত) -->
-  <div class="bg-teal-700 text-white text-xs py-1.5 px-4 overflow-hidden relative flex items-center z-50">
-    <span class="font-bold mr-2 shrink-0">NOTICE:</span>
-    <marquee id="marqueeNotice" scrollamount="4" class="w-full">লোড হচ্ছে...</marquee>
-  </div>
-
-  <!-- ইন-অ্যাপ ব্রাউজার হেডার ও অ্যাড্রেস বার -->
-  <header class="bg-slate-800 border-b border-slate-700 p-2 flex flex-col gap-2 z-40 shadow-md">
-    <div class="flex items-center gap-2">
-      <button onclick="goHome()" class="bg-slate-700 hover:bg-slate-600 p-2 rounded-lg text-sm font-semibold">🏠 Home</button>
-      <div class="flex-1 flex bg-slate-950 rounded-lg overflow-hidden border border-slate-700">
-        <input type="text" id="urlInput" placeholder="Enter URL to browse (e.g. facebook.com)" class="bg-transparent text-xs text-slate-200 px-3 py-2 w-full outline-none">
-        <button onclick="navigateBrowser()" class="bg-teal-600 hover:bg-teal-500 px-4 text-xs font-bold">Go</button>
-      </div>
-    </div>
-    <!-- কুইক শর্টকাট পোর্টাল সমূহ -->
-    <div class="flex gap-2 overflow-x-auto pb-1 text-xs scrollbar-none">
-      <button onclick="loadSite('https://www.facebook.com')" class="bg-blue-600 px-3 py-1 rounded-full shrink-0">Facebook</button>
-      <button onclick="loadSite('https://www.instagram.com')" class="bg-pink-600 px-3 py-1 rounded-full shrink-0">Instagram</button>
-      <button onclick="loadSite('https://www.youtube.com')" class="bg-red-600 px-3 py-1 rounded-full shrink-0">YouTube</button>
-      <button onclick="loadSite('https://web.whatsapp.com')" class="bg-green-600 px-3 py-1 rounded-full shrink-0">WhatsApp</button>
-      <button onclick="loadSite('https://google.com')" class="bg-slate-600 px-3 py-1 rounded-full shrink-0">Google</button>
-    </div>
+  <!-- থিম পরিবর্তন করার টপ হেডার বোতাম -->
+  <header class="absolute top-6 right-6 z-50">
+    <button onclick="toggleTheme()" class="bg-slate-800 hover:bg-slate-700 text-slate-100 p-2.5 rounded-full border border-slate-700 transition" aria-label="Toggle Theme">
+      <span id="themeBtnIcon" class="text-lg">🌙</span>
+    </button>
   </header>
 
-  <!-- ব্রাউজার ওয়ার্কস্পেস (আইফ্রেম) -->
-  <main class="flex-1 relative bg-slate-950">
-    <!-- হোম স্ক্রিন কন্টেন্ট (শুরুতে আইফ্রেম খালি থাকলে দেখাবে) -->
-    <div id="homePlaceholder" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10 bg-slate-900">
-      <div class="max-w-md">
-        <h2 class="text-2xl font-bold text-teal-400 mb-2">My Safe Browser</h2>
-        <p class="text-sm text-slate-400 mb-6">অ্যাপের ভেতরে থেকেই যেকোনো ওয়েবসাইট ভিজিট করুন নিরাপদ ও নির্বিঘ্নে।</p>
-        <div class="grid grid-cols-2 gap-4">
-          <button onclick="loadSite('https://mbasic.facebook.com')" class="bg-slate-800 hover:bg-slate-700 p-4 rounded-xl border border-slate-700">
-            <span class="block text-lg">📱</span>
-            <span class="text-xs font-semibold">Facebook Mobile</span>
-          </button>
-          <button onclick="loadSite('https://google.com')" class="bg-slate-800 hover:bg-slate-700 p-4 rounded-xl border border-slate-700">
-            <span class="block text-lg">🔍</span>
-            <span class="text-xs font-semibold">Google Search</span>
-          </button>
-        </div>
-      </div>
-    </div>
+  <!-- প্রধান ড্যাশবোর্ড কন্টেইনার -->
+  <div id="mainDashboard" class="w-full max-w-2xl text-center flex flex-col gap-8 py-10 transition-all duration-300">
+    
+    <!-- সময় ও গ্রিটিংস সেকশন -->
+    <section class="flex flex-col gap-2">
+      <h1 class="text-5xl font-bold tracking-tight text-white" id="clock">00:00 AM</h1>
+      <p class="text-lg text-slate-400 font-medium" id="greeting">Hello!</p>
+    </section>
 
-    <!-- মূল ব্রাউজার আইফ্রেম -->
-    <iframe id="browserFrame" class="w-full h-full border-none hidden" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
-  </main>
+    <!-- অ্যাড্রেস বার ও সার্চ ইঞ্জিন সিলেক্টর -->
+    <section class="w-full">
+      <form class="flex items-center gap-2 bg-slate-800/60 border border-slate-700/50 rounded-full px-4 py-2 shadow-lg" id="searchForm" onsubmit="handleSearchSubmit(event)">
+        <select class="bg-transparent border-none text-slate-400 text-xs font-semibold outline-none cursor-pointer pr-2 border-r border-slate-700/50" id="engineSelect">
+          <option value="google" class="bg-slate-900 text-white">Google</option>
+          <option value="duckduckgo" class="bg-slate-900 text-white">DuckDuckGo</option>
+        </select>
+        <input type="text" class="flex-1 bg-transparent border-none outline-none text-sm text-slate-100 placeholder-slate-500 py-1" id="searchInput" placeholder="Search the web or paste direct URL..." autocomplete="off">
+        <button class="text-teal-500 hover:text-teal-400 p-1" type="submit">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+          </svg>
+        </button>
+      </form>
+    </section>
+
+    <!-- শর্টকাট গ্রিড (প্রথম ডিজাইনের স্টাইল অনুযায়ী) -->
+    <section class="grid grid-cols-3 sm:grid-cols-5 gap-4">
+      <!-- Facebook Mobile Basic (আইফ্রেম ব্লকিং এড়ানোর জন্য এটি সবচেয়ে কার্যকর) -->
+      <button onclick="openInternalBrowser('https://mbasic.facebook.com')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <span class="text-2xl">📱</span>
+        <span class="text-xs font-semibold">Facebook</span>
+      </button>
+
+      <!-- Instagram -->
+      <button onclick="openInternalBrowser('https://www.instagram.com')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <span class="text-2xl">📸</span>
+        <span class="text-xs font-semibold">Instagram</span>
+      </button>
+
+      <!-- WhatsApp Web -->
+      <button onclick="openInternalBrowser('https://web.whatsapp.com')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <span class="text-2xl">💬</span>
+        <span class="text-xs font-semibold">WhatsApp</span>
+      </button>
+
+      <!-- Telegram Web -->
+      <button onclick="openInternalBrowser('https://web.telegram.org')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <span class="text-2xl">✈️</span>
+        <span class="text-xs font-semibold">Telegram</span>
+      </button>
+
+      <!-- Messenger -->
+      <button onclick="openInternalBrowser('https://www.messenger.com')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <span class="text-2xl">⚡</span>
+        <span class="text-xs font-semibold">Messenger</span>
+      </button>
+
+      <!-- TikTok -->
+      <button onclick="openInternalBrowser('https://www.tiktok.com')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <span class="text-2xl">🎵</span>
+        <span class="text-xs font-semibold">TikTok</span>
+      </button>
+
+      <!-- X (Twitter) -->
+      <button onclick="openInternalBrowser('https://www.x.com')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <span class="text-2xl">🐦</span>
+        <span class="text-xs font-semibold">Twitter (X)</span>
+      </button>
+
+      <!-- LinkedIn -->
+      <button onclick="openInternalBrowser('https://www.linkedin.com')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <span class="text-2xl">💼</span>
+        <span class="text-xs font-semibold">LinkedIn</span>
+      </button>
+
+      <!-- YouTube -->
+      <button onclick="openInternalBrowser('https://www.youtube.com')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <span class="text-2xl">🔴</span>
+        <span class="text-xs font-semibold">YouTube</span>
+      </button>
+
+      <!-- Google Search Homepage Shortcut -->
+      <button onclick="openInternalBrowser('https://www.google.com')" class="flex flex-col items-center gap-2 bg-slate-800/40 border border-slate-700/30 hover:border-slate-600/60 hover:bg-slate-800/80 p-4 rounded-2xl transition transform hover:-translate-y-1">
+        <span class="text-2xl">🌐</span>
+        <span class="text-xs font-semibold">Google</span>
+      </button>
+    </section>
+
+  </div>
+
+  <!-- ইন-অ্যাপ ব্রাউজার ওভারলে (অ্যাপের বাইরে কোনো রিডাইরেক্ট হবে না) -->
+  <div id="browserOverlay" class="fixed inset-0 bg-slate-950 flex flex-col z-[90000] transition-all transform translate-y-full duration-300 hidden">
+    <!-- ব্রাউজার কন্ট্রোল বার -->
+    <div class="bg-slate-900 border-b border-slate-800 p-3 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <button onclick="closeInternalBrowser()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-2 rounded-lg font-bold">✕ Close</button>
+        <button onclick="reloadInternalBrowser()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-2 rounded-lg font-bold">🔄 Reload</button>
+        <!-- আইফ্রেম ব্লকিং এড়ানোর জন্য অল্টারনেটিভ ভিউ বাটন -->
+        <button onclick="openViaAltMethod()" class="bg-teal-700 hover:bg-teal-600 text-white text-[11px] px-3 py-2 rounded-lg font-bold">Alt View 🌐</button>
+      </div>
+      <div class="flex-1 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 text-[11px] text-slate-400 text-center font-mono truncate max-w-xs" id="browserUrlDisplay">
+        about:blank
+      </div>
+      <div class="text-xs text-slate-500" id="browserLoadingState">Active</div>
+    </div>
+    <!-- ব্রাউজার কন্টেন্ট ফ্রেম -->
+    <div class="flex-1 bg-white relative">
+      <iframe id="browserIframe" class="w-full h-full border-none" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"></iframe>
+    </div>
+  </div>
 
   <!-- সর্বদাই দৃশ্যমান বাটন ১: NUMBER BOT (টেলিগ্রাম বট ওপেন করার জন্য) -->
-  <button onclick="openNumberBot()" class="floating-btn bottom-5 right-5 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white font-bold px-5 py-3.5 rounded-full flex items-center gap-2 transition-all transform hover:scale-105 active:scale-95 animate-pulse">
+  <button onclick="openNumberBot()" class="super-floating bottom-5 right-5 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white font-bold px-6 py-4 rounded-full flex items-center gap-2 transition-all transform hover:scale-105 active:scale-95 animate-pulse">
     <span>🤖</span>
     <span class="text-sm">Number Bot</span>
   </button>
 
-  <!-- সর্বদাই দৃশ্যমান বাটন ২: COOKIE COPIER (কুকি কপি করার প্যানেল) -->
-  <button onclick="openCookieManager()" class="floating-btn bottom-24 right-5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 font-semibold p-3.5 rounded-full flex items-center justify-center transition-all">
+  <!-- সর্বদাই দৃশ্যমান বাটন ২: COOKIE COPIER -->
+  <button onclick="openCookieManager()" class="super-floating bottom-24 right-5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 font-semibold p-4 rounded-full flex items-center justify-center transition-all transform hover:scale-105">
     <span>🍪</span>
   </button>
 
-  <!-- সাপোর্ট চ্যানেলে জয়েন করার নোটিফিকেশন মডাল (প্রথমবার ওপেন করলে আসবে) -->
-  <div id="supportModal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-[999999] hidden">
+  <!-- নোটিশ ও সাপোর্ট জয়েনিং মডাল (নোটিশ সিস্টেম মেসেজ আকারে স্ক্রিনে পপআপ হবে) -->
+  <div id="noticeModal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-[999999] hidden">
     <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
       <div class="text-4xl mb-3">📢</div>
-      <h3 class="text-lg font-bold text-teal-400 mb-2">সাপোর্ট চ্যানেলে জয়েন করুন!</h3>
-      <p id="supportNoticeText" class="text-xs text-slate-300 mb-6">আমাদের সাপোর্ট চ্যানেলে জয়েন করে নতুন সব আপডেট ও সাহায্য সরাসরি গ্রহণ করুন।</p>
+      <h3 class="text-lg font-bold text-teal-400 mb-2">জরুরী ঘোষণা!</h3>
+      <p id="noticeModalText" class="text-xs text-slate-300 mb-6 leading-relaxed">লোড হচ্ছে...</p>
       <div class="flex flex-col gap-2">
-        <a id="btnSupportJoin" href="#" target="_blank" onclick="closeSupportModal()" class="bg-teal-600 hover:bg-teal-500 py-2.5 rounded-lg text-sm font-bold block text-white">Join Channel</a>
-        <button onclick="closeSupportModal()" class="text-slate-400 hover:text-slate-300 text-xs py-1">পরে করবো</button>
+        <a id="btnSupportJoin" href="#" target="_blank" onclick="closeNoticeModal()" class="bg-teal-600 hover:bg-teal-500 py-2.5 rounded-lg text-sm font-bold block text-white shadow-md">Join Support Channel</a>
+        <button onclick="closeNoticeModal()" class="text-slate-400 hover:text-slate-300 text-xs py-1.5">Close Message</button>
       </div>
     </div>
   </div>
 
-  <!-- কুকি দেখার ও কপি করার মডাল উইন্ডো -->
+  <!-- কুকি দেখার ও কপি করার উইন্ডো প্যানেল -->
   <div id="cookieModal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-[999999] hidden">
     <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-sm font-bold text-teal-400">🍪 Cookie & Storage Helper</h3>
+        <h3 class="text-sm font-bold text-teal-400">🍪 Cookie Helper</h3>
         <button onclick="closeCookieModal()" class="text-slate-400 text-sm">✕</button>
       </div>
       <p class="text-[11px] text-slate-400 mb-3 leading-relaxed">
-        নিরাপত্তাজনিত কারণে ব্রাউজার আইফ্রেমের ভেতরের থার্ড-পার্টি কুকি সরাসরি স্ক্রিপ্ট দিয়ে কপি করা সম্ভব নয়। তবে নিচের বাটনটি দিয়ে এই ডোমেইনের কুকি অথবা ম্যানুয়ালি ইনপুট দিয়ে কপি করতে পারেন।
+        নিরাপত্তাজনিত কারণে ব্রাউজার ওভারলের কুকি সরাসরি জাভাস্ক্রিপ্ট পড়তে পারে না। তবে এই ডোমেইনের কুকি অথবা নিচের টেক্সট বক্সে পেস্ট করে যেকোনো ডাটা ক্লিপবোর্ডে কপি করতে পারেন।
       </p>
-      <textarea id="cookieBox" class="w-full h-24 bg-slate-950 text-slate-300 font-mono text-[10px] p-2 rounded-lg border border-slate-700 outline-none resize-none mb-3" placeholder="Cookies will appear here or paste raw string..."></textarea>
+      <textarea id="cookieBox" class="w-full h-24 bg-slate-950 text-slate-300 font-mono text-[10px] p-2.5 rounded-lg border border-slate-700 outline-none resize-none mb-3" placeholder="Cookies/Session state will appear here..."></textarea>
       <div class="flex gap-2">
-        <button onclick="copyCookiesToClipboard()" class="flex-1 bg-teal-600 hover:bg-teal-500 py-2 rounded-lg text-xs font-bold">Copy to Clipboard</button>
-        <button onclick="readLocalCookies()" class="bg-slate-700 hover:bg-slate-600 px-3 rounded-lg text-xs">Read</button>
+        <button onclick="copyCookiesToClipboard()" class="flex-1 bg-teal-600 hover:bg-teal-500 py-2.5 rounded-lg text-xs font-bold transition shadow">Copy to Clipboard</button>
+        <button onclick="readLocalCookies()" class="bg-slate-700 hover:bg-slate-600 px-3 rounded-lg text-xs transition">Read Current</button>
       </div>
     </div>
   </div>
 
-  <!-- ব্যান স্ক্রিন (ব্যানড ইউজারদের জন্য পুরো অ্যাপ ব্লক করা হবে) -->
+  <!-- ব্যান স্ক্রিন (ব্যানড ইউজারদের জন্য পুরো অ্যাপ লক করা হবে) -->
   <div id="banScreen" class="fixed inset-0 bg-slate-950 flex flex-col items-center justify-center p-6 text-center z-[9999999] hidden">
     <div class="text-6xl mb-4">🚫</div>
-    <h1 class="text-2xl font-bold text-red-500 mb-2">আপনার অ্যাকাউন্টটি সাময়িকভাবে স্থগিত করা হয়েছে</h1>
-    <p class="text-sm text-slate-400 max-w-md">অ্যাডমিন কর্তৃক আপনার ইউজার আইডিটি ব্লক করা হয়েছে। বিস্তারিত জানতে সাপোর্টে যোগাযোগ করুন।</p>
+    <h1 class="text-2xl font-bold text-red-500 mb-2">আপনার অ্যাকাউন্টটি স্থগিত করা হয়েছে</h1>
+    <p class="text-sm text-slate-400 max-w-md">অ্যাডমিন কর্তৃক আপনার টেলিগ্রাম অ্যাকাউন্টটি ব্লক করা হয়েছে। বিস্তারিত জানতে সাপোর্টে যোগাযোগ করুন।</p>
   </div>
 
   <script>
-    // --- SUPABASE CONFIGURATION ---
-    const SUPABASE_URL = "https://xodqwxxeeeyoayfdtlno.supabase.co"; // আপনার Supabase URL বসান
-    const SUPABASE_ANON_KEY = "sb_publishable_jj7OSFz9Ze8MLuIvOmLdJA_0j_RFppz"; // আপনার Supabase Anon Key বসান
+    // --- SUPABASE CONFIGURATION (Renamed to prevent shadowing/redeclaration bugs) ---
+    const SUPABASE_URL = "https://xodqwxxeeeyoayfdtlno.supabase.co"; 
+    const SUPABASE_ANON_KEY = "sb_publishable_jj7OSFz9Ze8MLuIvOmLdJA_0j_RFppz"; 
     
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // global 'supabase' variable from script tag is used here
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // --- TELEGRAM APP INITIALIZATION ---
+    // --- TELEGRAM WEB APP SDK ---
     let tg = window.Telegram?.WebApp;
     if (tg) {
-      tg.expand(); // টেলিগ্রাম স্ক্রিন বড় করা
+      tg.expand();
       tg.ready();
     }
 
-    // ডিফল্ট ডামি ইউজার (টেলিগ্রামের বাইরে টেস্ট করার জন্য)
+    // ডিফল্ট ডামি ইউজার (টেলিগ্রামের বাইরে সাধারণ ব্রাউজারে টেস্ট করার জন্য)
     let userProfile = {
-      id: "WebUser_12345",
-      username: "Guest_User",
-      first_name: "Web Guest"
+      id: "WebUser_Testing_12345",
+      username: "Web_Tester",
+      first_name: "Web Browser Guest"
     };
 
     // টেলিগ্রাম থেকে ইউজার ডাটা রিসিভ করা
@@ -150,21 +271,22 @@
       };
     }
 
-    let botLink = "https://t.me/your_number_bot"; // ডামি বট লিংক
-    let supportLink = "https://t.me/your_support_channel";
+    let botLink = "https://t.me/shs_method_bot"; // আপনার দেওয়া মিনি অ্যাপের প্রধান বটের লিংক
+    let supportLink = "https://t.me/shs_method_bot";
+    let currentBrowserUrl = "about:blank";
 
     // --- APP START UP ---
     window.addEventListener('DOMContentLoaded', async () => {
+      updateClock();
+      setInterval(updateClock, 1000);
       await registerAndCheckUser();
       await fetchAppSettings();
-      showAnnouncementNotification();
     });
 
-    // ১. ইউজার রেজিস্টার এবং ব্যান স্ট্যাটাস চেক করা
+    // ১. ইউজার রেজিস্টার এবং ব্যান পরীক্ষা করা
     async function registerAndCheckUser() {
       try {
-        // প্রথমে ডাটাবেজে ইউজার চেক করা
-        const { data: user, error } = await supabase
+        const { data: user, error } = await supabaseClient
           .from('telegram_users')
           .select('*')
           .eq('id', userProfile.id)
@@ -173,19 +295,16 @@
         if (error) throw error;
 
         if (user) {
-          // ইউজার ব্যান আছে কিনা পরীক্ষা
           if (user.is_banned) {
             document.getElementById('banScreen').classList.remove('hidden');
             return;
           }
-          // শেষ অ্যাক্টিভিটি টাইম আপডেট
-          await supabase
+          await supabaseClient
             .from('telegram_users')
             .update({ last_active: new Date().toISOString() })
             .eq('id', userProfile.id);
         } else {
-          // নতুন ইউজার ডাটাবেজে সেভ করা
-          await supabase
+          await supabaseClient
             .from('telegram_users')
             .insert([{
               id: userProfile.id,
@@ -197,20 +316,21 @@
             }]);
         }
       } catch (e) {
-        console.error("User registration failed: ", e);
+        console.error("User sync failed: ", e);
       }
     }
 
-    // ২. এডমিন প্যানেলের নোটিশ, বটের লিংক এবং সাপোর্ট লিংক রিমোটলি লোড করা
+    // ২. রিমোট সেটিংস, নোটিশ, সাপোর্ট লিংক এবং বট লিংক লোড করা
     async function fetchAppSettings() {
       try {
-        const { data, error } = await supabase.from('app_settings').select('*');
+        const { data, error } = await supabaseClient.from('app_settings').select('*');
         if (error) throw error;
+
+        let noticeMessage = "";
 
         data.forEach(item => {
           if (item.key === 'global_notice') {
-            document.getElementById('marqueeNotice').textContent = item.value;
-            document.getElementById('supportNoticeText').textContent = item.value;
+            noticeMessage = item.value;
           }
           if (item.key === 'support_link') {
             supportLink = item.value;
@@ -220,49 +340,153 @@
             botLink = item.value;
           }
         });
+
+        // নোটিশ মেসেজ আকারে সামনে পপআপ করার জন্য
+        if (noticeMessage) {
+          document.getElementById('noticeModalText').textContent = noticeMessage;
+          const hasSeenNotice = localStorage.getItem('seen_notice_' + btoa(noticeMessage));
+          if (!hasSeenNotice) {
+            document.getElementById('noticeModal').classList.remove('hidden');
+          }
+        }
       } catch (e) {
-        console.error("Failed to load settings: ", e);
+        console.error("Failed loading configuration: ", e);
       }
     }
 
-    // ৩. প্রথমবার জয়েন করার প্রম্পট নোটিফিকেশন দেখানো
-    function showAnnouncementNotification() {
-      const hasJoined = localStorage.getItem('has_seen_join_modal');
-      if (!hasJoined) {
-        document.getElementById('supportModal').classList.remove('hidden');
+    // ৩. রিয়েল-টাইম ঘড়ি এবং গ্রিটিংস
+    function updateClock() {
+      const clockElement = document.getElementById('clock');
+      const greetingElement = document.getElementById('greeting');
+      const now = new Date();
+
+      let hours = now.getHours();
+      let minutes = now.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+
+      hours = hours % 12;
+      hours = hours ? hours : 12; 
+      minutes = minutes < 10 ? '0' + minutes : minutes;
+
+      if (clockElement) clockElement.textContent = `${hours}:${minutes} ${ampm}`;
+
+      const realHour = now.getHours();
+      if (greetingElement) {
+        if (realHour < 12) {
+          greetingElement.textContent = 'শুভ সকাল, আপনার কাজ সম্পন্ন করুন';
+        } else if (realHour < 18) {
+          greetingElement.textContent = 'শুভ দুপুর, ব্রাউজার ব্যবহার করুন';
+        } else {
+          greetingElement.textContent = 'শুভ সন্ধ্যা, আপনার টাস্ক কমপ্লিট করুন';
+        }
       }
     }
 
-    function closeSupportModal() {
-      localStorage.setItem('has_seen_join_modal', 'true');
-      document.getElementById('supportModal').classList.add('hidden');
+    // ৪. থিম পরিবর্তন লজিক
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      const icon = theme === 'dark' ? '🌙' : '☀️';
+      const themeIconEl = document.getElementById('themeBtnIcon');
+      if (themeIconEl) themeIconEl.textContent = icon;
     }
 
-    // ৪. ইন-অ্যাপ ব্রাউজার ন্যাভিগেশন ও আইফ্রেম সেটআপ
-    function loadSite(url) {
-      document.getElementById('homePlaceholder').classList.add('hidden');
-      const iframe = document.getElementById('browserFrame');
-      iframe.classList.remove('hidden');
-      iframe.src = url;
-      document.getElementById('urlInput').value = url;
+    // Attach function to window to prevent "not defined" errors in HTML attributes
+    window.toggleTheme = function() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(targetTheme);
     }
 
-    function navigateBrowser() {
-      let url = document.getElementById('urlInput').value.trim();
-      if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme);
+
+    // ৫. সার্চ এবং ইনপুট ইউআরএল হ্যান্ডলিং
+    window.handleSearchSubmit = function(event) {
+      event.preventDefault();
+      const query = document.getElementById('searchInput').value.trim();
+      const engine = document.getElementById('engineSelect').value;
+
+      if (!query) return;
+
+      let destinationUrl = query;
+      if (query.includes('.') && !query.includes(' ')) {
+        if (!query.startsWith('http://') && !query.startsWith('https://')) {
+          destinationUrl = 'https://' + query;
+        }
+      } else {
+        if (engine === 'duckduckgo') {
+          destinationUrl = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
+        } else {
+          destinationUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        }
       }
-      loadSite(url);
+
+      openInternalBrowser(destinationUrl);
     }
 
-    function goHome() {
-      document.getElementById('browserFrame').classList.add('hidden');
-      document.getElementById('homePlaceholder').classList.remove('hidden');
-      document.getElementById('urlInput').value = "";
+    // ৬. ইন-অ্যাপ ব্রাউজার ওভারলে কন্ট্রোল
+    window.openInternalBrowser = function(url) {
+      const overlay = document.getElementById('browserOverlay');
+      const iframe = document.getElementById('browserIframe');
+      const displayUrl = document.getElementById('browserUrlDisplay');
+      
+      currentBrowserUrl = url;
+      if (displayUrl) displayUrl.textContent = url;
+      document.getElementById('browserLoadingState').textContent = "Loading...";
+      
+      if (overlay) overlay.classList.remove('hidden');
+      if (iframe) iframe.src = url;
+      
+      setTimeout(() => {
+        if (overlay) overlay.classList.remove('translate-y-full');
+      }, 50);
+
+      if (iframe) {
+        iframe.onload = () => {
+          document.getElementById('browserLoadingState').textContent = "Loaded";
+        };
+      }
     }
 
-    // ৫. NUMBER BOT ওপেন করার অ্যাকশন
-    function openNumberBot() {
+    window.closeInternalBrowser = function() {
+      const overlay = document.getElementById('browserOverlay');
+      const iframe = document.getElementById('browserIframe');
+      
+      if (overlay) overlay.classList.add('translate-y-full');
+      setTimeout(() => {
+        if (overlay) overlay.classList.add('hidden');
+        if (iframe) iframe.src = 'about:blank';
+      }, 300);
+    }
+
+    window.reloadInternalBrowser = function() {
+      const iframe = document.getElementById('browserIframe');
+      if (iframe && iframe.src) {
+        iframe.src = iframe.src;
+      }
+    }
+
+    // আইফ্রেম সিকিউরিটি পলিসি বাইপাস করার জন্য অল্টারনেটিভ ভিউ মেথড
+    window.openViaAltMethod = function() {
+      if (currentBrowserUrl && currentBrowserUrl !== "about:blank") {
+        // টেলিগ্রামের স্ট্যান্ডার্ড ইন-অ্যাপ ব্রাউজার ব্যবহার করা (এটি ফেসবুকের আইফ্রেম ব্লকিং এড়িয়ে চলবে)
+        if (tg) {
+          tg.openLink(currentBrowserUrl);
+        } else {
+          window.open(currentBrowserUrl, '_blank');
+        }
+      }
+    }
+
+    window.closeNoticeModal = function() {
+      const noticeText = document.getElementById('noticeModalText').textContent;
+      localStorage.setItem('seen_notice_' + btoa(noticeText), 'true');
+      document.getElementById('noticeModal').classList.add('hidden');
+    }
+
+    // ৭. Number Bot অ্যাকশন
+    window.openNumberBot = function() {
       if (tg) {
         tg.openTelegramLink(botLink);
       } else {
@@ -270,33 +494,34 @@
       }
     }
 
-    // ৬. কুকি ম্যানেজার অ্যাকশন
-    function openCookieManager() {
+    // ৮. কুকি ম্যানেজার অ্যাকশন
+    window.openCookieManager = function() {
       document.getElementById('cookieModal').classList.remove('hidden');
       readLocalCookies();
     }
 
-    function closeCookieModal() {
+    window.closeCookieModal = function() {
       document.getElementById('cookieModal').classList.add('hidden');
     }
 
     function readLocalCookies() {
-      // লোকাল কুকি রিড করার চেষ্টা করা
       try {
-        const cookies = document.cookie || "No local cookies accessible on this site. You can paste custom raw headers or cookies here to keep them in clipboard.";
+        const cookies = document.cookie || "No local domain cookies available. Feel free to use this textbox as a clipboard sync.";
         document.getElementById('cookieBox').value = cookies;
       } catch (e) {
-        document.getElementById('cookieBox').value = "Error reading cookies.";
+        document.getElementById('cookieBox').value = "Error reading browser cookie storage.";
       }
     }
 
-    function copyCookiesToClipboard() {
+    window.copyCookiesToClipboard = function() {
       const box = document.getElementById('cookieBox');
-      box.select();
-      box.setSelectionRange(0, 99999);
-      navigator.clipboard.writeText(box.value);
-      alert("Cookies copied to clipboard!");
+      if (box) {
+        box.select();
+        box.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(box.value);
+        alert("State copied to clipboard!");
+      }
     }
   </script>
 </body>
-  </html>
+</html>
